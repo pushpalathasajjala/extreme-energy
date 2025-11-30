@@ -1,64 +1,36 @@
 import streamlit as st
 import pandas as pd
-import altair as alt
+import plotly.express as px
 
-# Load Data
+# Load dataset
 df = pd.read_excel("forecast_results_2024_2029.xlsx")
 
 st.set_page_config(page_title="Forecast Dashboard", layout="wide")
 
-st.title("📊 Forecast Dashboard (2024–2029)")
+st.title("📊 Forecast Dashboard (2024-2029)")
 
-# ----------------- SIDEBAR FILTERS -----------------
-with st.sidebar:
-    st.header("🔍 Filters")
+# --- SIDEBAR FILTERS ---
+categories = st.sidebar.multiselect("Select Category", df['Category'].unique())
+countries = st.sidebar.multiselect("Select Country", df['Country'].unique())
+years     = st.sidebar.multiselect("Select Year", df['Year'].unique())
 
-    category_filter = st.multiselect("Select Category", df["Category"].unique())
-    country_filter  = st.multiselect("Select Country", df["Country"].unique())
-    year_filter     = st.multiselect("Select Year", df["Year"].unique())
-
-# ----------------- APPLY FILTERS -----------------
-filtered_df = df[
-    ((df["Category"].isin(category_filter)) if category_filter else True) &
-    ((df["Country"].isin(country_filter))  if country_filter else True) &
-    ((df["Year"].isin(year_filter))        if year_filter else True)
+# Apply Filters
+filtered = df[
+    (df['Category'].isin(categories) if categories else True) &
+    (df['Country'].isin(countries) if countries else True) &
+    (df['Year'].isin(years) if years else True)
 ]
 
-st.subheader("📄 Filtered Dataset")
-st.dataframe(filtered_df, use_container_width=True)
+st.subheader("📈 Forecasted Trend")
+fig1 = px.line(filtered, x="Year", y="Forecast", color="Category", markers=True)
+st.plotly_chart(fig1, use_container_width=True)
 
-# ----------------- LINE CHART: FORECAST TREND -----------------
-st.subheader("📈 Forecast Trend Over Years")
+st.subheader("📊 Growth/Market Share")
+fig2 = px.bar(filtered, x="Year", y="Growth%", color="Country", barmode="group")
+st.plotly_chart(fig2, use_container_width=True)
 
-line_chart = alt.Chart(filtered_df).mark_line(point=True).encode(
-    x="Year:O",
-    y="Predicted:Q",
-    color="Category:N",
-    tooltip=["Category", "Country", "Year", "Predicted"]
-).interactive()
+# Show Data Table
+st.dataframe(filtered)
 
-st.altair_chart(line_chart, use_container_width=True)
-
-# ----------------- BAR CHART: GROWTH -----------------
-st.subheader("📊 Growth by Year")
-
-bar_chart = alt.Chart(filtered_df).mark_bar().encode(
-    x="Year:O",
-    y="Growth:Q",
-    color="Country:N",
-    tooltip=["Category", "Country", "Year", "Growth"]
-).interactive()
-
-st.altair_chart(bar_chart, use_container_width=True)
-
-# ----------------- DATA DOWNLOAD OPTION -----------------
-csv = filtered_df.to_csv(index=False)
-st.download_button(
-    label="⬇ Download Filtered Data",
-    data=csv,
-    file_name="forecast_filtered_data.csv",
-    mime="text/csv"
-)
-
-st.success("Dashboard Loaded Successfully") 
-
+# Download Button
+st.download_button("⬇ Download Filtered Data", data=filtered.to_csv(index=False), file_name="filtered_data.csv")
