@@ -17,8 +17,8 @@ years     = st.sidebar.multiselect("Select Year", df['pred_2024'].unique())
 # Apply Filters
 filtered = df[
     (df['Category'].isin(categories) if categories else True) &
-    (df['Country'].isin(countries) if countries else True) &
-    (df['Year'].isin(years) if years else True)
+    (df['Area'].isin(countries) if countries else True) &
+    (df['pred_2024'].isin(years) if years else True)
 ]
 
 st.subheader("📈 Forecasted Trend")
