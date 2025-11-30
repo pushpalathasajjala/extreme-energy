@@ -12,7 +12,7 @@ st.title("📊 Forecast Dashboard (2024-2029)")
 # --- SIDEBAR FILTERS ---
 categories = st.sidebar.multiselect("Select Category", df['Category'].unique())
 countries = st.sidebar.multiselect("Select Country", df['Area'].unique())
-years     = st.sidebar.multiselect("Select Year", df['Year'].unique())
+years     = st.sidebar.multiselect("Select Year", df['pred_2024'].unique())
 
 # Apply Filters
 filtered = df[
