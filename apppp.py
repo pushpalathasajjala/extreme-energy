@@ -12,14 +12,12 @@ st.title("📊 Forecast Dashboard (2024-2029)")
 # --- SIDEBAR FILTERS ---
 categories = st.sidebar.multiselect("Select Category", df['Category'].unique())
 countries = st.sidebar.multiselect("Select Country", df['Area'].unique())
-years     = st.sidebar.multiselect("Select Year", df['pred_2024'].unique())
 
 # Apply Filters
 filtered = df[
     (df['Category'].isin(categories) if categories else True) &
     (df['Area'].isin(countries) if countries else True) &
-    (df['pred_2024'].isin(years) if years else True)
-]
+   
 
 st.subheader("📈 Forecasted Trend")
 fig1 = px.line(filtered, x="Year", y="Forecast", color="Category", markers=True)
